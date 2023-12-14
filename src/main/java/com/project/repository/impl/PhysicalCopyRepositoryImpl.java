@@ -21,28 +21,6 @@ public class PhysicalCopyRepositoryImpl implements PhysicalCopyRepository {
 
     private static final String SELECT_ALL = "SELECT b FROM PhysicalCopyEntity b WHERE 1 = 1";
 
-    @Override
-    public List<PhysicalCopyEntity> getAll(Filter... filters) {
-        String dynamicQuery = SELECT_ALL;
-
-        if(filters != null){
-            if(filters[0].getValue() != null){
-                dynamicQuery += "AND c." + filters[0].getField() + " " +
-                        filters[0].getOperator() + " '%" + filters[0].getValue() + "%' ";
-            }
-            if (filters[0].getSort() != null) {
-                dynamicQuery += "ORDER BY c." + filters[0].getField() + " " + filters[0].getSort();
-            }
-            if (filters[0].getPageSize() != null && filters[0].getPageNumber() != null) {
-                return entityManager.createQuery(dynamicQuery, PhysicalCopyEntity.class)
-                        .setFirstResult((filters[0].getPageNumber() - 1) * filters[0].getPageSize())
-                        .setMaxResults(filters[0].getPageSize())
-                        .getResultList();
-            }
-        }
-        return entityManager.createQuery(dynamicQuery, PhysicalCopyEntity.class).getResultList();
-    }
-
     @Transactional
     @Override
     public PhysicalCopyEntity save(PhysicalCopyEntity entity) {
@@ -107,6 +85,28 @@ public class PhysicalCopyRepositoryImpl implements PhysicalCopyRepository {
         } catch (NoResultException e){
             return null;
         }
+    }
+
+    @Override
+    public List<PhysicalCopyEntity> getAll(Filter... filters) {
+        String dynamicQuery = SELECT_ALL;
+
+        if(filters != null){
+            if(filters[0].getValue() != null){
+                dynamicQuery += "AND c." + filters[0].getField() + " " +
+                        filters[0].getOperator() + " '%" + filters[0].getValue() + "%' ";
+            }
+            if (filters[0].getSort() != null) {
+                dynamicQuery += "ORDER BY c." + filters[0].getField() + " " + filters[0].getSort();
+            }
+            if (filters[0].getPageSize() != null && filters[0].getPageNumber() != null) {
+                return entityManager.createQuery(dynamicQuery, PhysicalCopyEntity.class)
+                        .setFirstResult((filters[0].getPageNumber() - 1) * filters[0].getPageSize())
+                        .setMaxResults(filters[0].getPageSize())
+                        .getResultList();
+            }
+        }
+        return entityManager.createQuery(dynamicQuery, PhysicalCopyEntity.class).getResultList();
     }
 
 }

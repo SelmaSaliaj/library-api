@@ -1,10 +1,13 @@
 package com.project.repository.impl;
 
 import com.project.domain.entity.UserEntity;
-import com.project.filter.Filter;
+import com.project.domain.exception.ResourceNotFoundException;
 import com.project.repository.UserRepository;
+import com.project.util.Constants;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
@@ -13,34 +16,8 @@ import java.util.List;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    private static final String FIND_QUERY = "SELECT u FROM UserEntity u WHERE u.id = :id";
-
-    private static final String SELECT_ALL = "SELECT u FROM UserEntity u WHERE 1 = 1";
-
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Override
-    public List<UserEntity> getAll(Filter... filters) {
-        String dynamicQuery = SELECT_ALL;
-
-        if (filters != null) {
-            if (filters[0].getValue() != null) {
-                dynamicQuery += "AND c." + filters[0].getField() + " " +
-                        filters[0].getOperator() + " '%" + filters[0].getValue() + "%' ";
-            }
-            if (filters[0].getSort() != null) {
-                dynamicQuery += "ORDER BY c." + filters[0].getField() + " " + filters[0].getSort();
-            }
-            if (filters[0].getPageSize() != null && filters[0].getPageNumber() != null) {
-                return entityManager.createQuery(dynamicQuery, UserEntity.class)
-                        .setFirstResult((filters[0].getPageNumber() - 1) * filters[0].getPageSize())
-                        .setMaxResults(filters[0].getPageSize())
-                        .getResultList();
-            }
-        }
-        return entityManager.createQuery(dynamicQuery, UserEntity.class).getResultList();
-    }
 
     @Transactional
     @Override
@@ -58,8 +35,16 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public UserEntity findById(Integer id) {
-        return entityManager.createQuery(FIND_QUERY,UserEntity.class)
-                .setParameter("id",id).getSingleResult();
+        try{
+            UserEntity user = entityManager.createQuery(Constants.SELECT_USER_BY_ID,UserEntity.class)
+                    .setParameter("id",id).getSingleResult();
+            if(user == null){
+                throw new NoResultException("Not found");
+            }
+            return user;
+        } catch (NoResultException e){
+            throw new ResourceNotFoundException("User with id: " + id + " doesn't exist");
+        }
     }
 
     @Transactional
@@ -67,6 +52,28 @@ public class UserRepositoryImpl implements UserRepository {
     public UserEntity delete(UserEntity entity) {
         entityManager.remove(entity);
         return entity;
+    }
+
+    @Override
+    public UserEntity findByUsername(String username) {
+        try{
+            UserEntity user = entityManager.createQuery(Constants.SELECT_USER_BY_USERNAME,UserEntity.class)
+                    .setParameter("username",username).getSingleResult();
+            if(user == null){
+                throw new NoResultException("Not found");
+            }
+            return user;
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    @Override
+    public List<UserEntity> getAll(int pageNumber, int pageSize) {
+        TypedQuery<UserEntity> findQuery = entityManager.createQuery(Constants.SELECT_ALL_USER,UserEntity.class);
+        findQuery.setFirstResult((pageNumber - 1) * pageSize);
+        findQuery.setMaxResults(pageSize);
+        return findQuery.getResultList();
     }
 
 }

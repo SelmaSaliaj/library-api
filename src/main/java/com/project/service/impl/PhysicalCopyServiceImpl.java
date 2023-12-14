@@ -8,6 +8,7 @@ import com.project.domain.exception.MethodCanNotBePerformedException;
 import com.project.domain.exception.ResourceNotFoundException;
 import com.project.domain.mapper.PhysicalCopyMapper;
 import com.project.filter.Filter;
+import com.project.repository.BookReservationRepository;
 import com.project.repository.LocationRepository;
 import com.project.repository.PhysicalCopyRepository;
 import com.project.service.PhysicalCopyService;
@@ -23,16 +24,16 @@ import java.util.stream.Collectors;
 @Service
 public class PhysicalCopyServiceImpl implements PhysicalCopyService {
 
-    //@Autowired
     private final PhysicalCopyRepository repository;
-
-    //@Autowired
     private final LocationRepository locationRepository;
+    private final BookReservationRepository bookReservationRepository;
 
     @Autowired
-    public PhysicalCopyServiceImpl(PhysicalCopyRepository repository, LocationRepository locationRepository) {
+    public PhysicalCopyServiceImpl(PhysicalCopyRepository repository, LocationRepository locationRepository,
+                                   BookReservationRepository bookReservationRepository) {
         this.repository = repository;
         this.locationRepository = locationRepository;
+        this.bookReservationRepository = bookReservationRepository;
     }
 
     @Override
@@ -66,9 +67,16 @@ public class PhysicalCopyServiceImpl implements PhysicalCopyService {
         request.setAuthor(ValidationUtils.checkIfValueIsNotCorrectlyValidated(request.getAuthor(), "author"));
         ValidationUtils.checkIfValueIsNotCorrectlyValidated(request.getNumberOfCopies());
 
-        if((ValidationUtils.checkIfBookWithGivenTitleAndAuthorAlreadyExists(id, request, repository) == null)){
+        //check this condition again, you might need to add the method int this if in the other method as well
+        // another way, you might just make the method void and afterwords just check the book
+        ValidationUtils.checkIfBookWithGivenTitleAndAuthorAlreadyExists(id, request, repository);
+        //look more into if it's important to have this condition or rather replace it with
+        // areThereAnyBookReservationsForTheGivenBook method
+        ValidationUtils.checkForOnGoingReservations(book, request);
+
+        /*if((ValidationUtils.checkIfBookWithGivenTitleAndAuthorAlreadyExists(id, request, repository) == null)){
             ValidationUtils.checkForOnGoingReservations(book, request);
-        }
+        }*/
 
         int newValueOfAvailableCopies = ValidationUtils.getNewValueOfAvailableCopies(request, book);
 
@@ -87,13 +95,32 @@ public class PhysicalCopyServiceImpl implements PhysicalCopyService {
 
     }
 
+    @Override
+    public PhysicalCopyDTO update(PhysicalCopyDTO book) {
+        return PhysicalCopyMapper.toDTO(repository.update(PhysicalCopyMapper.toEntity(book)));
+    }
+
     @Transactional
     @Override
     public PhysicalCopyDTO delete(Integer id) {
 
         PhysicalCopyDTO book = findById(id);
 
+        ValidationUtils.checkForBookAccessibility(id,book);
+
         if(ValidationUtils.isNotReserved(book)){
+            //check if there are existing (deleted = false) book reservations that
+            //contain this book, if yes it can not be deleted
+            // else perform the delete below and add the cascade at the book
+            // or for a better solution check if overall there are still reservations
+            // that were done with this book and if yes just change the number of total copies
+            // to 0
+            if(ValidationUtils.areThereAnyBookReservationsForTheGivenBook(id,bookReservationRepository)){
+                book.setNumberOfCopies(0);
+                book.setNumberOfCopiesAvailable(0);
+                // maybe make it so location can be null just in this case
+                return PhysicalCopyMapper.toDTO(repository.update(PhysicalCopyMapper.toEntity(book)));
+            }
             return PhysicalCopyMapper.toDTO(repository.delete(repository.findById(id)));
         } else {
             throw new MethodCanNotBePerformedException("Book with id:" + id + " can not be deleted, " +

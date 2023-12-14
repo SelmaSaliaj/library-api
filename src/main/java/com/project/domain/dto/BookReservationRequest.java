@@ -12,20 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BookReservationRequest {
 
-    //private LocalDateTime createdDate;
-
-    //private LocalDateTime lastModified;
-
     private LocalDateTime returnedDate;
 
     private String title;
 
     private String author;
-
-    //private BookReservationStatus status;
-
-    //private Integer reservationId;
-
-    //private Integer bookId;
 
 }

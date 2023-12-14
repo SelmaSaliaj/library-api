@@ -12,4 +12,6 @@ public interface EBookRepository extends BaseRepository<EBookEntity,Integer> {
 
     EBookEntity findByTitleAndAuthor(String title, String author);
 
+    List<EBookEntity> getAll(int pageNumber, int pageSize);
+
 }

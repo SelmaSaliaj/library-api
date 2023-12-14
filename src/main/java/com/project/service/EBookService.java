@@ -2,7 +2,6 @@ package com.project.service;
 
 import com.project.domain.dto.EBookDTO;
 import com.project.domain.dto.EBookRequest;
-import com.project.filter.Filter;
 
 import java.util.List;
 
@@ -22,6 +21,6 @@ public interface EBookService {
 
     EBookDTO findByTitleAndAuthor(String title, String author);
 
-    List<EBookDTO> getAllEBooks(Filter... filters);
+    List<EBookDTO> getAllEBooks(int pageNumber, int pageSize);
 
 }

@@ -21,35 +21,11 @@ public class ReaderRepositoryImpl implements ReaderRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<ReaderEntity> getAll(Filter... filters) {
-        String dynamicQuery = SELECT_ALL;
-
-        if (filters != null) {
-            if (filters[0].getValue() != null) {
-                dynamicQuery += "AND c." + filters[0].getField() + " " +
-                        filters[0].getOperator() + " '%" + filters[0].getValue() + "%' ";
-            }
-            if (filters[0].getSort() != null) {
-                dynamicQuery += "ORDER BY c." + filters[0].getField() + " " + filters[0].getSort();
-            }
-            if (filters[0].getPageSize() != null && filters[0].getPageNumber() != null) {
-                return entityManager.createQuery(dynamicQuery, ReaderEntity.class)
-                        .setFirstResult((filters[0].getPageNumber() - 1) * filters[0].getPageSize())
-                        .setMaxResults(filters[0].getPageSize())
-                        .getResultList();
-            }
-        }
-        return entityManager.createQuery(dynamicQuery, ReaderEntity.class).getResultList();
-    }
-
-    //@Transactional
-    @Override
     public ReaderEntity save(ReaderEntity entity) {
         entityManager.persist(entity);
         return entity;
     }
 
-    //@Transactional
     @Override
     public ReaderEntity update(ReaderEntity entity) {
         entityManager.merge(entity);
@@ -70,7 +46,6 @@ public class ReaderRepositoryImpl implements ReaderRepository {
         }
     }
 
-    //@Transactional
     @Override
     public ReaderEntity delete(ReaderEntity entity) {
         entityManager.remove(entity);
@@ -107,29 +82,17 @@ public class ReaderRepositoryImpl implements ReaderRepository {
         }
     }
 
-    //@Transactional
     @Override
     public ReaderEntity softDelete(ReaderEntity entity) {
         entity.setDeleted(true);
         return update(entity);
     }
 
-    /*
-    @Override
-    public ReaderEntity softDelete(ReaderEntity entity) {
-        entity.setDeleted(true);
-        update(entity);
-        entityManager.flush();
-        return findById(entity.getId());
-    }
-     */
-
     //@Transactional
     //will probably delete method
     @Override
     public ReaderEntity restore(ReaderEntity entity) {
         entity.setDeleted(false);
-        //update(entity);
         return entity;
     }
 
@@ -145,6 +108,28 @@ public class ReaderRepositoryImpl implements ReaderRepository {
         } catch (NoResultException e){
             return null;
         }
+    }
+
+    @Override
+    public List<ReaderEntity> getAll(Filter... filters) {
+        String dynamicQuery = SELECT_ALL;
+
+        if (filters != null) {
+            if (filters[0].getValue() != null) {
+                dynamicQuery += "AND c." + filters[0].getField() + " " +
+                        filters[0].getOperator() + " '%" + filters[0].getValue() + "%' ";
+            }
+            if (filters[0].getSort() != null) {
+                dynamicQuery += "ORDER BY c." + filters[0].getField() + " " + filters[0].getSort();
+            }
+            if (filters[0].getPageSize() != null && filters[0].getPageNumber() != null) {
+                return entityManager.createQuery(dynamicQuery, ReaderEntity.class)
+                        .setFirstResult((filters[0].getPageNumber() - 1) * filters[0].getPageSize())
+                        .setMaxResults(filters[0].getPageSize())
+                        .getResultList();
+            }
+        }
+        return entityManager.createQuery(dynamicQuery, ReaderEntity.class).getResultList();
     }
 
 }

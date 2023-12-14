@@ -32,6 +32,6 @@ public class ReaderEntity extends BaseEntity{
     @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL)
     private List<ReservationEntity> reservations;
 
-    @OneToOne(mappedBy = "reader", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "reader", cascade = CascadeType.PERSIST)
     private UserEntity user;
 }

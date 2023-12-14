@@ -4,13 +4,15 @@ import com.project.domain.dto.LocationDTO;
 import com.project.service.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/location")
 public class LocationController {
 
-    //@Autowired
     private final LocationService locationService;
 
     @Autowired
@@ -19,33 +21,33 @@ public class LocationController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<LocationDTO> findById(@PathVariable("id") Integer id){
         return ResponseEntity.ok(locationService.findById(id));
     }
 
-    /*@PostMapping
-    public void save(@RequestBody @Valid LocationRequest location){
-        locationService.save(location);
-    }*/
-
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void save(@RequestParam String nameOfTheShelf){
         locationService.save(nameOfTheShelf);
     }
 
-    /*@PutMapping("/{id}")
-    public void update(@PathVariable Integer id, @RequestBody @Valid LocationRequest location){
-        locationService.update(id, location);
-    }*/
-
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void update(@PathVariable Integer id, @RequestParam String nameOfTheShelf){
         locationService.update(id, nameOfTheShelf);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void delete(@PathVariable("id") Integer id){
         locationService.delete(id);
+    }
+
+    @GetMapping("/{pageNumber}/{size}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
+    public List<LocationDTO> getAll(@PathVariable int pageNumber, @PathVariable int size){
+        return locationService.getAllLocations(pageNumber,size);
     }
 
 }

@@ -13,7 +13,7 @@ public interface ReaderService {
     //the two find by id need to return a value for the sake of the program
     ReaderDTO findByIdAndDeletedValueFalse(Integer id);
 
-    ReaderDTO findByIdAndDeletedValueTrue(Integer id);
+    void findByIdAndDeletedValueTrue(Integer id);
 
     ReaderDTO save(ReaderRequest request);
 

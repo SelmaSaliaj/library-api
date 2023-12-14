@@ -14,7 +14,7 @@ CREATE TABLE ebook (
 CREATE TABLE location (
                           id INT NOT NULL AUTO_INCREMENT,
                           shelf_name VARCHAR(225) NOT NULL,
-                          PRIMARY KEY (id)
+                          PRIMARY KEY (id
 );
 
 CREATE TABLE reader (
@@ -38,6 +38,7 @@ CREATE TABLE user (
                       CONSTRAINT reader_id
                           FOREIGN KEY (reader_id)
                               REFERENCES reader (id)
+                              ON DELETE SET NULL
 );
 
 CREATE TABLE reservation (

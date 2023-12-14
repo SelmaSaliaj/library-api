@@ -5,7 +5,6 @@ import com.project.domain.dto.EBookRequest;
 import com.project.domain.entity.EBookEntity;
 import com.project.domain.exception.ResourceNotFoundException;
 import com.project.domain.mapper.EBookMapper;
-import com.project.filter.Filter;
 import com.project.repository.EBookRepository;
 import com.project.service.EBookService;
 import com.project.util.ValidationUtils;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 @Service
 public class EBookServiceImpl implements EBookService {
 
-    //@Autowired
     private final EBookRepository repository;
 
     @Autowired
@@ -113,9 +111,9 @@ public class EBookServiceImpl implements EBookService {
     }
 
     @Override
-    public List<EBookDTO> getAllEBooks(Filter... filters) {
-        List<EBookEntity> ebooks = repository.getAll(filters);
-        return ebooks.stream()
+    public List<EBookDTO> getAllEBooks(int pageNumber, int pageSize) {
+        List<EBookEntity> list = repository.getAll(pageNumber,pageSize);
+        return list.stream()
                 .map(EBookMapper::toDTO)
                 .collect(Collectors.toList());
     }

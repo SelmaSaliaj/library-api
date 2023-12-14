@@ -1,15 +1,9 @@
 package com.project.domain.mapper;
 
 import com.project.domain.dto.LocationDTO;
-import com.project.domain.dto.LocationRequest;
 import com.project.domain.entity.LocationEntity;
 
 public class LocationMapper {
-    public static LocationEntity toEntity(LocationRequest locationRequest){
-        LocationEntity toReturn = new LocationEntity();
-        toReturn.setNameOfTheShelf(locationRequest.getNameOfTheShelf());
-        return toReturn;
-    }
 
     public static LocationEntity toEntity(String locationRequest){
         LocationEntity toReturn = new LocationEntity();

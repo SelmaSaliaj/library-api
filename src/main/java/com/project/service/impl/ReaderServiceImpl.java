@@ -20,13 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class ReaderServiceImpl implements ReaderService {
 
-    //@Autowired
     private final ReaderRepository repository;
-
-    //@Autowired
     private final ReservationRepository reservationRepository;
-
-    //@Autowired
     private final BookReservationRepository bookReservationRepository;
 
     @Autowired
@@ -51,8 +46,8 @@ public class ReaderServiceImpl implements ReaderService {
 
     //will probably delete
     @Override
-    public ReaderDTO findByIdAndDeletedValueTrue(Integer id) {
-        return ReaderMapper.toDTO(repository.findByIdAndDeletedValueTrue(id));
+    public void findByIdAndDeletedValueTrue(Integer id) {
+        ReaderMapper.toDTO(repository.findByIdAndDeletedValueTrue(id));
     }
 
     //user (?) and admin
@@ -108,6 +103,13 @@ public class ReaderServiceImpl implements ReaderService {
     @Transactional
     @Override
     public ReaderDTO delete(Integer id) {
+        findById(id);
+        return ReaderMapper.toDTO(repository.delete(repository.findById(id)));
+    }
+
+    @Transactional
+    @Override
+    public ReaderDTO delete(Integer id) {
         findByIdAndDeletedValueFalse(id);
         if (ValidationUtils.checkBeforeDeleteToSoftDeleteIfConditionsAreMet(id,
                 reservationRepository,bookReservationRepository)){
@@ -122,8 +124,13 @@ public class ReaderServiceImpl implements ReaderService {
     @Transactional
     @Override
     public ReaderDTO delete(Integer id) {
-        findById(id);
-        return ReaderMapper.toDTO(repository.delete(repository.findById(id)));
+        findByIdAndDeletedValueFalse(id);
+        if (ValidationUtils.checkBeforeDeleteToSoftDeleteIfConditionsAreMet(id,
+                reservationRepository,bookReservationRepository)){
+            return ReaderMapper.toDTO(repository.softDelete(repository.findById(id)));
+        } else {
+            return ReaderMapper.toDTO(repository.delete(repository.findById(id)));
+        }
     }
 
     //kujdes findById njera duhet te jete me deleted = false , disa me deleted = true

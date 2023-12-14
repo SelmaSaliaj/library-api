@@ -2,12 +2,12 @@ package com.project.repository.impl;
 
 import com.project.domain.entity.EBookEntity;
 import com.project.domain.exception.ResourceNotFoundException;
-import com.project.filter.Filter;
 import com.project.util.Constants;
 import com.project.repository.EBookRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
@@ -16,32 +16,8 @@ import java.util.List;
 @Repository
 public class EBookRepositoryImpl implements EBookRepository {
 
-    private static final String SELECT_ALL = "SELECT e FROM EBookEntity e WHERE 1 = 1";
-
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Override
-    public List<EBookEntity> getAll(Filter... filters) {
-        String dynamicQuery = SELECT_ALL;
-
-        if (filters != null) {
-            if (filters[0].getValue() != null) {
-                dynamicQuery += "AND e." + filters[0].getField() + " " +
-                        filters[0].getOperator() + " '%" + filters[0].getValue() + "%' ";
-            }
-            if (filters[0].getSort() != null) {
-                dynamicQuery += "ORDER BY e." + filters[0].getField() + " " + filters[0].getSort();
-            }
-            if (filters[0].getPageSize() != null && filters[0].getPageNumber() != null) {
-                return entityManager.createQuery(dynamicQuery, EBookEntity.class)
-                        .setFirstResult((filters[0].getPageNumber() - 1) * filters[0].getPageSize())
-                        .setMaxResults(filters[0].getPageSize())
-                        .getResultList();
-            }
-        }
-        return entityManager.createQuery(dynamicQuery, EBookEntity.class).getResultList();
-    }
 
     @Transactional
     @Override
@@ -106,6 +82,14 @@ public class EBookRepositoryImpl implements EBookRepository {
         }catch (NoResultException e){
             return null;
         }
+    }
+
+    @Override
+    public List<EBookEntity> getAll(int pageNumber, int pageSize) {
+        TypedQuery<EBookEntity> findQuery = entityManager.createQuery(Constants.SELECT_ALL_EBOOK,EBookEntity.class);
+        findQuery.setFirstResult((pageNumber - 1) * pageSize);
+        findQuery.setMaxResults(pageSize);
+        return findQuery.getResultList();
     }
 
 }
