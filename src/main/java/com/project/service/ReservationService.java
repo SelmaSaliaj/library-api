@@ -1,8 +1,6 @@
 package com.project.service;
 
-import com.project.domain.dto.ReaderDTO;
 import com.project.domain.dto.ReservationDTO;
-import com.project.domain.entity.ReservationEntity;
 import com.project.filter.Filter;
 
 import java.time.LocalDateTime;
@@ -16,11 +14,11 @@ public interface ReservationService{
 
     ReservationDTO findByIdAndDeletedValueTrue(Integer id);
 
-    List<ReservationDTO> findByIdAndLocalDate(Integer id, LocalDateTime date);
-
     ReservationDTO save(Integer readerId);
 
     ReservationDTO update(Integer id, LocalDateTime modified_date);
+
+    ReservationDTO update(ReservationDTO reservation);
 
     ReservationDTO softDelete(Integer id);
 
@@ -28,8 +26,12 @@ public interface ReservationService{
 
     ReservationDTO delete(Integer id);
 
-    List<ReservationEntity> findReservationsByReaderId(Integer id);
+    List<ReservationDTO> findReservationsByReaderId(Integer id);
 
-    List<ReaderDTO> getAllReservations(Filter... filters);
+    ReservationDTO findReservationsByReaderIdAndLocalDate(Integer id, LocalDateTime date);
+
+    List<ReservationDTO> findByLocalDate(LocalDateTime date);
+
+    List<ReservationDTO> getAllReservations(Filter... filters);
 
 }

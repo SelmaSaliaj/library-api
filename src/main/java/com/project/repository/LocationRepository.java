@@ -11,4 +11,6 @@ public interface LocationRepository extends BaseRepository<LocationEntity,Intege
 
     List<PhysicalCopyEntity> findBooksByLocationId(Integer id);
 
+    List<LocationEntity> getAll(int pageNumber, int pageSize);
+
 }

@@ -15,7 +15,10 @@ import com.project.domain.mapper.ReaderMapper;
 import com.project.repository.*;
 import jakarta.persistence.NoResultException;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -93,18 +96,30 @@ public class ValidationUtils {
             throw new NullPointerException("The requested value: " + null +
                     " can not be applied for the requested field: " + field);
         }
+
         value = value.trim();
         if(value.isEmpty()){
             throw new ValueNotSupportedException("The requested field: " + field +
                     " must contain a value.");
         }
 
-        if (value.equals("null")){
-            throw new ValueNotSupportedException("The requested value: " + null +
-                    " can not be applied for the requested field: " + field);
+        if (field.equals("password")){
+            checkIfPasswordIsNotWithinTheWantedRange(value, field);
         }
 
-        if(field.equals("phoneNumber")) checkIfPhoneNumberIsNotCorrectlyValidated(value);
+        if (value.equalsIgnoreCase("null")) {
+            throw new ValueNotSupportedException("The requested value: " + value +
+                        " can not be applied for the requested field: " + field);
+        }
+
+        if(field.equals("username")){
+            checkIfUsernameIsNotWithinTheWantedRange(value, field);
+            value = value.toLowerCase();
+        }
+
+        if(field.equals("phoneNumber")) {
+            checkIfPhoneNumberIsNotCorrectlyValidated(value);
+        }
 
         if(field.equals("email")){
             value = value.toLowerCase();
@@ -112,6 +127,20 @@ public class ValidationUtils {
         }
 
         return value;
+    }
+
+    public static void checkIfUsernameIsNotWithinTheWantedRange(String value, String field){
+        if(value.length()<3){
+            throw new ValueNotSupportedException("The requested field: " + field +
+                    " must contain a value with at least 3 letters.");
+        }
+    }
+
+    public static void checkIfPasswordIsNotWithinTheWantedRange(String value, String field){
+        if(value.length()<5){
+            throw new ValueNotSupportedException("The requested field: " + field +
+                    " must contain a value with at least 5 letters.");
+        }
     }
 
     public static void checkIfPhoneNumberIsNotCorrectlyValidated(String value){
@@ -138,7 +167,7 @@ public class ValidationUtils {
 
     public static void checkIfEmailIsNotCorrectlyValidated(String value){
         if (!isEmailValid(value)){
-            throw new ValueNotSupportedException("The given email " + value +
+            throw new ValueNotSupportedException("The given email: " + value +
                     " is not valid");
         }
     }
@@ -146,6 +175,38 @@ public class ValidationUtils {
     public static boolean isEmailValid(String email){
         Matcher matcher = Constants.EMAIL_PATTERN.matcher(email);
         return matcher.matches();
+    }
+
+    public static void checkIfValueIsNotCorrectlyValidated(LocalDateTime dateTime,
+                                                           LocalDateTime currentDateTime,
+                                                           int requestedDays){
+        if(isDateTimeValid(dateTime)){
+            checkIfValueIsWithinTheWantedRange(dateTime,currentDateTime,requestedDays);
+        } else {
+            throw new ValueNotSupportedException("The given date and time: " + dateTime +
+                    " is not valid");
+        }
+    }
+
+    public static void checkIfValueIsWithinTheWantedRange(LocalDateTime dateTime,
+                                                          LocalDateTime currentDateTime,
+                                                          int requestedDays){
+        LocalDateTime maxReservationDateTime = currentDateTime.plusDays(requestedDays);
+        if(dateTime.isBefore(maxReservationDateTime) && dateTime.isAfter(currentDateTime)){
+            throw new ValueNotSupportedException("The given date and time: " + dateTime +
+                    " is not valid. You can not make a reservation till before: " +
+                    maxReservationDateTime + " and till after: " + currentDateTime);
+        }
+    }
+
+    public static boolean isDateTimeValid(LocalDateTime dateTime){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_TIME_PATTERN);
+        try {
+            String formattedDateTime = dateTime.format(formatter);
+            return formattedDateTime.matches(Constants.DATE_TIME_REGEX);
+        } catch (DateTimeException e){
+            return false;
+        }
     }
 
     public static void checkIfEBookWithGivenTitleAndAuthorAlreadyExists(Integer id, EBookRequest request,
@@ -254,6 +315,17 @@ public class ValidationUtils {
 
     public static void checkForOnGoingReservations(PhysicalCopyDTO book,
                                                    PhysicalCopyRequest request){
+        if(!isNotReserved(book)){
+            throw new MethodCanNotBePerformedException("Book with title:" + book.getTitle() +
+                    " and author: " + book.getAuthor() + " can not be changed to title: " +
+                    request.getTitle() + " and author: " + request.getAuthor() +
+                    " due to on going reservations");
+        }
+    }
+
+    /*
+    public static void checkForOnGoingReservations(PhysicalCopyDTO book,
+                                                   PhysicalCopyRequest request){
         try {
             isNotReserved(book);
         } catch (MethodCanNotBePerformedException e){
@@ -263,6 +335,7 @@ public class ValidationUtils {
                     " due to on going reservations");
         }
     }
+     */
 
     public static void checkIfReaderWithGivenEmailAlreadyExists(ReaderRequest request,
                                                                 ReaderRepository repository) {
@@ -384,6 +457,20 @@ public class ValidationUtils {
                             reservation.getId() + ". You can only create one reservation per day");
                 }
             }
+        }
+    }
+
+    public static boolean areThereAnyBookReservationsForTheGivenBook(Integer id, BookReservationRepository bookReservationRepository){
+        List<BookReservationEntity> bookReservations = bookReservationRepository.findBookReservationsByBookId(id);
+        return bookReservations != null;
+    }
+
+    public static void checkForBookAccessibility(Integer id, PhysicalCopyDTO book){
+        if (book.getNumberOfCopies() == 0){
+            throw new MethodCanNotBePerformedException("Book with id:" + id +
+                    " can not be accessed for reservation anymore, " +
+                    " but it's existence is important for the records," +
+                    " therefore you can not fully delete it.");
         }
     }
 

@@ -1,12 +1,15 @@
 package com.project.controller;
 
 import com.project.domain.dto.BookReservationDTO;
-import com.project.domain.dto.ReservationDTO;
+import com.project.domain.dto.BookReservationRequest;
 import com.project.service.BookReservationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/bookReservation")
@@ -20,21 +23,33 @@ public class BookReservationController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<BookReservationDTO> findById(@PathVariable("id") Integer id){
-        return ResponseEntity.ok(bookReservationService.findById(id));
+        return ResponseEntity.ok(bookReservationService.findByIdAndDeletedValueFalse(id));
     }
 
-    @PostMapping
-    public void save(@RequestBody BookReservationDTO bookReservationDTO){
-        bookReservationService.save(bookReservationDTO);
+    @PostMapping("/{readerId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public void save(@PathVariable Integer readerId, @RequestBody BookReservationRequest request){
+        bookReservationService.save(readerId,request);
     }
 
-    @PutMapping
-    public void update(@RequestBody BookReservationDTO bookReservationDTO){
-        bookReservationService.update(bookReservationDTO);
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public void update(@PathVariable Integer id,
+                       @RequestParam("newToReturnDateTime")
+                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime newToReturnDateTime){
+       bookReservationService.update(id, newToReturnDateTime);
+    }
+
+    @PatchMapping("/statusChange/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public void updateStatusToReturned(@PathVariable Integer id){
+        bookReservationService.updateStatusToReturned(id);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void delete(@PathVariable("id") Integer id){
         bookReservationService.delete(id);
     }

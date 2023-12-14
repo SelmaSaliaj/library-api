@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.time.DateTimeException;
 
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
@@ -45,6 +46,13 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler
     public ResponseEntity<ExceptionMessage> handleValueNotSupportedException(NullPointerException exp,
+                                                                             HttpServletRequest req){
+        var response = new ExceptionMessage(HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), exp.getMessage());
+        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionMessage> handleValueNotSupportedException(DateTimeException exp,
                                                                              HttpServletRequest req){
         var response = new ExceptionMessage(HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), exp.getMessage());
         return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);

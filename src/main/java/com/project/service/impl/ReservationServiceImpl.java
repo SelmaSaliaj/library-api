@@ -23,13 +23,8 @@ import java.util.stream.Collectors;
 @Service
 public class ReservationServiceImpl implements ReservationService {
 
-    //@Autowired
     private final ReservationRepository repository;
-
-    //@Autowired
     private final ReaderRepository readerRepository;
-
-    //@Autowired
     private final BookReservationRepository bookReservationRepository;
 
     @Autowired
@@ -63,10 +58,10 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<ReservationDTO> findByIdAndLocalDate(Integer id, LocalDateTime date) {
-        List<ReservationEntity> reservations = repository.findReservationsByIdAndLocalDate(id, date.toLocalDate());
+    public List<ReservationDTO> findByLocalDate(LocalDateTime date) {
+        List<ReservationEntity> reservations = repository.findReservationsByLocalDate(date.toLocalDate());
         if(reservations == null){
-            throw new ResourceNotFoundException("Reservation with id: " + id + " and date: " +
+            throw new ResourceNotFoundException("Reservation with created date: " +
                     date.toLocalDate() + " does not exist.");
         }
         return reservations.stream()
@@ -94,6 +89,12 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationDTO update(Integer id, LocalDateTime modified_date) {
         ReservationDTO reservation = findByIdAndDeletedValueFalse(id);
         reservation.setLastModified(modified_date);
+        return Constants.RESERVATION_MAPPER.toReservationDTO(repository
+                .update(Constants.RESERVATION_MAPPER.toReservationEntity(reservation)));
+    }
+
+    @Override
+    public ReservationDTO update(ReservationDTO reservation) {
         return Constants.RESERVATION_MAPPER.toReservationDTO(repository
                 .update(Constants.RESERVATION_MAPPER.toReservationEntity(reservation)));
     }
@@ -129,17 +130,27 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<ReservationEntity> findReservationsByReaderId(Integer id) {
+    public List<ReservationDTO> findReservationsByReaderId(Integer id) {
         readerRepository.findByIdAndDeletedValueFalse(id);
         List<ReservationEntity> reservations = repository.findReservationsByReaderId(id);
         if (reservations == null){
             throw new ResourceNotFoundException("There are no reservations for reader with id: " + id);
         }
-        return reservations;
+        return reservations.stream()
+                .map(Constants.RESERVATION_MAPPER::toReservationDTO)
+                .toList();
     }
 
     @Override
-    public List<ReaderDTO> getAllReservations(Filter... filters) {
+    public ReservationDTO findReservationsByReaderIdAndLocalDate(Integer id, LocalDateTime date) {
+        readerRepository.findByIdAndDeletedValueFalse(id);
+        repository.findReservationsByReaderIdAndLocalDate(id,date.toLocalDate());
+        return Constants.RESERVATION_MAPPER
+                .toReservationDTO(repository.findReservationsByReaderIdAndLocalDate(id,date.toLocalDate()));
+    }
+
+    @Override
+    public List<ReservationDTO> getAllReservations(Filter... filters) {
         return null;
     }
 

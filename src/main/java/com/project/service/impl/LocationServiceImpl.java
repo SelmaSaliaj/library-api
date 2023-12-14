@@ -4,7 +4,6 @@ import com.project.domain.dto.LocationDTO;
 import com.project.domain.entity.LocationEntity;
 import com.project.domain.exception.MethodCanNotBePerformedException;
 import com.project.domain.mapper.LocationMapper;
-import com.project.filter.Filter;
 import com.project.repository.LocationRepository;
 import com.project.service.LocationService;
 import com.project.util.ValidationUtils;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-    //@Autowired
     private final LocationRepository repository;
 
     @Autowired
@@ -30,18 +28,6 @@ public class LocationServiceImpl implements LocationService {
     public LocationDTO findById(Integer id) {
         return LocationMapper.toDTO(repository.findById(id));
     }
-
-    /*@Transactional
-    @Override
-    public void save(LocationRequest request) {
-
-        request.setNameOfTheShelf(ValidationUtils.checkIfValueIsNotCorrectlyValidated(request.getNameOfTheShelf(),
-                "nameOfTheShelf"));
-
-        ValidationUtils.checkIfLocationWithGivenShelfNameAlreadyExists(request,repository);
-
-        LocationMapper.toDTO(repository.save(LocationMapper.toEntity(request)));
-    }*/
 
     @Transactional
     @Override
@@ -77,26 +63,6 @@ public class LocationServiceImpl implements LocationService {
         return LocationMapper.toDTO(repository.update(LocationMapper.toEntity(locationDTO)));
     }
 
-    /*@Transactional
-    @Override
-    public void update(Integer id, LocationRequest request) {
-
-        findById(id);
-
-        request.setNameOfTheShelf(ValidationUtils.checkIfValueIsNotCorrectlyValidated(request.getNameOfTheShelf(),
-                "nameOfTheShelf"));
-
-        ValidationUtils.checkIfLocationWithGivenShelfNameAlreadyExists(id, request, repository);
-
-        if(ValidationUtils.areNoBooksFoundInGivenLocation(id, repository)){
-            LocationDTO locationDTO = LocationMapper.toDTO(LocationMapper.toEntity(request));
-            locationDTO.setId(id);
-
-            repository.update(LocationMapper.toEntity(locationDTO));
-        }
-
-    }*/
-
     @Transactional
     @Override
     public LocationDTO delete(Integer id) {
@@ -109,9 +75,9 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public List<LocationDTO> getAllLocations(Filter... filters) {
-        List<LocationEntity> locations = repository.getAll(filters);
-        return locations.stream()
+    public List<LocationDTO> getAllLocations(int pageNumber, int pageSize) {
+        List<LocationEntity> list = repository.getAll(pageNumber,pageSize);
+        return list.stream()
                 .map(LocationMapper::toDTO)
                 .collect(Collectors.toList());
     }

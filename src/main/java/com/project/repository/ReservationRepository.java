@@ -1,6 +1,7 @@
 package com.project.repository;
 
 import com.project.domain.entity.ReservationEntity;
+import com.project.filter.Filter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,10 @@ public interface ReservationRepository extends BaseRepository<ReservationEntity,
 
     List<ReservationEntity> findReservationsByReaderId(Integer id);
 
-    List<ReservationEntity> findReservationsByIdAndLocalDate(Integer id, LocalDate createdDate);
+    ReservationEntity findReservationsByReaderIdAndLocalDate(Integer id, LocalDate createdDate);
+
+    List<ReservationEntity> findReservationsByLocalDate(LocalDate createdDate);
+
+    List<ReservationEntity> getAll(Filter... filters);
 
 }

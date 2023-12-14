@@ -1,6 +1,6 @@
 package com.project.domain.dto;
 
-import com.project.domain.entity.UserEntity;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,12 +11,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserRequest {
 
+    @NotBlank(message = "Username is required")
     private String username;
 
+    @NotBlank(message = "Password is required")
     private String password;
 
-    private String authorities;
-
-    private UserEntity reader;
+    private ReaderRequest reader;
 
 }

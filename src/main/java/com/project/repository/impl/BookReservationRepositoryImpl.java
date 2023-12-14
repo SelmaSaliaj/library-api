@@ -10,6 +10,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -17,11 +18,6 @@ public class BookReservationRepositoryImpl implements BookReservationRepository 
 
     @PersistenceContext
     EntityManager entityManager;
-
-    @Override
-    public List<BookReservationEntity> getAll(Filter... filters) {
-        return null;
-    }
 
     @Override
     public BookReservationEntity save(BookReservationEntity entity) {
@@ -51,7 +47,7 @@ public class BookReservationRepositoryImpl implements BookReservationRepository 
     @Override
     public BookReservationEntity findByIdAndDeletedValueFalse(Integer id) {
         try{
-            BookReservationEntity bookReservation = entityManager.createQuery(Constants.SELECT_RESERVATION_BY_ID_AND_DELETED_FALSE,
+            BookReservationEntity bookReservation = entityManager.createQuery(Constants.SELECT_BOOK_RESERVATION_BY_ID_AND_DELETED_FALSE,
                     BookReservationEntity.class).setParameter("id",id).getSingleResult();
             if(bookReservation == null){
                 throw new NoResultException("No results were found");
@@ -79,13 +75,13 @@ public class BookReservationRepositoryImpl implements BookReservationRepository 
     @Override
     public List<BookReservationEntity> findBookReservationsByReservationId(Integer id) {
         try{
-            List<BookReservationEntity> bookReservationEntities = entityManager
+            List<BookReservationEntity> bookReservations = entityManager
                     .createQuery(Constants.SELECT_BOOK_RESERVATION_BY_RESERVATION_ID, BookReservationEntity.class)
                     .setParameter("id",id).getResultList();
-            if (bookReservationEntities.isEmpty()){
+            if (bookReservations.isEmpty()){
                 throw new NoResultException("No results were found");
             }
-            return bookReservationEntities;
+            return bookReservations;
         } catch (NoResultException e){
             return null;
         }
@@ -94,15 +90,66 @@ public class BookReservationRepositoryImpl implements BookReservationRepository 
     @Override
     public List<BookReservationEntity> findBookReservationsByReservationIdAndStatusNotReturned(Integer id) {
         try{
-            List<BookReservationEntity> bookReservationEntities = entityManager
+            List<BookReservationEntity> bookReservations = entityManager
                     .createQuery(Constants.SELECT_BOOK_RESERVATION_BY_RESERVATION_ID_AND_STATUS_NOT_RETURNED,
                     BookReservationEntity.class).setParameter("id",id).getResultList();
-            if (bookReservationEntities.isEmpty()){
+            if (bookReservations.isEmpty()){
                 throw new NoResultException("No results were found");
             }
-            return bookReservationEntities;
+            return bookReservations;
         } catch (NoResultException e){
             return null;
         }
     }
+
+    @Override
+    public List<BookReservationEntity> findBookReservationsByBookId(Integer id) {
+        try{
+            List<BookReservationEntity> bookReservations = entityManager
+                    .createQuery(Constants.SELECT_BOOK_RESERVATION_BY_BOOK_ID,
+                            BookReservationEntity.class).setParameter("id",id).getResultList();
+            if (bookReservations.isEmpty()){
+                throw new NoResultException("No results were found");
+            }
+            return bookReservations;
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    @Override
+    public List<BookReservationEntity> findReservationsByIdAndLocalDate(Integer id, LocalDate createdDate) {
+        try{
+            List<BookReservationEntity> bookReservations = entityManager
+                    .createQuery(Constants.SELECT_BOOK_RESERVATION_BY_ID_AND_CREATED_DATE, BookReservationEntity.class)
+                    .setParameter("id",id).setParameter("createdDate",createdDate).getResultList();
+            if(bookReservations.isEmpty()){
+                throw new NoResultException("No results were found");
+            }
+            return bookReservations;
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    @Override
+    public List<BookReservationEntity> findReservationsByLocalDate(LocalDate createdDate) {
+        try{
+            List<BookReservationEntity> bookReservations = entityManager
+                    .createQuery(Constants.SELECT_BOOK_RESERVATION_BY_CREATED_DATE, BookReservationEntity.class)
+                    .setParameter("createdDate",createdDate).getResultList();
+            if(bookReservations.isEmpty()){
+                throw new NoResultException("No results were found");
+            }
+            return bookReservations;
+        } catch (NoResultException e){
+            return null;
+        }
+    }
+
+    @Override
+    public List<BookReservationEntity> getAll(Filter... filters) {
+        return null;
+    }
+
 }

@@ -64,4 +64,5 @@ public class PhysicalCopyMapper {
         toReturn.setNumberOfCopiesAvailable(copy.getNumberOfCopiesAvailable());
         return toReturn;
     }
+
 }

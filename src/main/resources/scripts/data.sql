@@ -31,17 +31,17 @@ VALUES (1, false, "Ana", "Bekteshi", "anabekteshi@gmail.com","Rruga 'Sami Frashe
        (7, false, "Rosilda", "Agolli", "rosildaagolli@gmail.com","Rruga 'Sami Frasheri'","0694077402");
 
 INSERT INTO user
-VALUES (1,"Ana Bekteshi","$2a$10$i8lUYAMiTs2vfdBOk.Q5vuI1RtpYcN4V4deZ9lORCm3HDmAe.ULd2","ROLE_USER",1),
-       (2,"Emiraldo Cakaj","$2a$10$i7lUYAMiTs2vfdBOk.Q5vuI1RtpYcN4V4deZ2lORCm3HDmAe.ULd2","ROLE_USER",2),
-       (3,"Enkeleda Kalliri","$3a$10$i6lUYAMiTs2vfdBOk.Q2vuI1RtpYcN4V4deZ9lORCm3HDmAe.ULd2","ROLE_USER",3),
-       (4,"Klaudja Hoxha","$2a$10$i9lUYAMiTs2vfdBOk.Q5vuI1RtpYcN6V4deZ9lORCm3HDmAe.ULd2","ROLE_USER",4),
-       (5,"Eraldo Hoxha","$3a$12$i7lUYAMiTs2vfdBOk.Q5vuI1RtpYcN4V4deZ9lORCm3HDmAe.ULd2","ROLE_USER",5),
-       (6,"Serxho Gjoni","$2a$20$i7lUYAMiTs2vfdBOk.Q5vuI1RtpYcN5V4deZ9lORCm3HDmAe.ULd2","ROLE_USER",6),
-       (7,"Rosilda Agolli","$2a$10$i3lUYAMiTs2vfdBOk.Q5vuI1RtpYcN7V4deZ9lORCm3HDmAe.ULd2","ROLE_USER",7);
+VALUES (1,"Ana Bekteshi","$2a$10$i8lUYAMiTs2vfdBOk.Q5vuI1RtpYcN4V4deZ9lORCm3HDmAe.ULd2","USER",1),
+       (2,"Emiraldo Cakaj","$2a$10$i7lUYAMiTs2vfdBOk.Q5vuI1RtpYcN4V4deZ2lORCm3HDmAe.ULd2","USER",2),
+       (3,"Enkeleda Kalliri","$3a$10$i6lUYAMiTs2vfdBOk.Q2vuI1RtpYcN4V4deZ9lORCm3HDmAe.ULd2","USER",3),
+       (4,"Klaudja Hoxha","$2a$10$i9lUYAMiTs2vfdBOk.Q5vuI1RtpYcN6V4deZ9lORCm3HDmAe.ULd2","USER",4),
+       (5,"Eraldo Hoxha","$3a$12$i7lUYAMiTs2vfdBOk.Q5vuI1RtpYcN4V4deZ9lORCm3HDmAe.ULd2","USER",5),
+       (6,"Serxho Gjoni","$2a$20$i7lUYAMiTs2vfdBOk.Q5vuI1RtpYcN5V4deZ9lORCm3HDmAe.ULd2","USER",6),
+       (7,"Rosilda Agolli","$2a$10$i3lUYAMiTs2vfdBOk.Q5vuI1RtpYcN7V4deZ9lORCm3HDmAe.ULd2","USER",7);
 
 INSERT INTO user(id, username, password, authorities)
-VALUES (8,"Leonardo Mezini","$2a$10$4KZkw2qHxG4uanOF5Vpcxu.UP5a1244p/9uHuOHrYzs2fdtmKVYl2","ROLE_ADMIN"),
-       (9,"Antonela Malaj","$2a$10$4KZkw2qHxG4uanOF5Vpcxu.UP5a1244p/9uHuOHrYzs2fdtmKVYl2","ROLE_ADMIN");
+VALUES (8,"Leonardo Mezini","$2a$10$4KZkw2qHxG4uanOF5Vpcxu.UP5a1244p/9uHuOHrYzs2fdtmKVYl2","ADMIN"),
+       (9,"Antonela Malaj","$2a$10$4KZkw2qHxG4uanOF5Vpcxu.UP5a1244p/9uHuOHrYzs2fdtmKVYl2","ADMIN");
 
 INSERT INTO reservation(id, create_date, last_modified, deleted, id_reader)
 VALUES (1,'2023-04-16','2023-04-16',false,1),

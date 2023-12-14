@@ -1,6 +1,9 @@
 package com.project.repository;
 
 import com.project.domain.entity.ReaderEntity;
+import com.project.filter.Filter;
+
+import java.util.List;
 
 public interface ReaderRepository extends BaseRepository<ReaderEntity,Integer> {
 
@@ -15,5 +18,7 @@ public interface ReaderRepository extends BaseRepository<ReaderEntity,Integer> {
     ReaderEntity restore(ReaderEntity entity);
 
     ReaderEntity findByEmail(String email);
+
+    List<ReaderEntity> getAll(Filter... filters);
 
 }

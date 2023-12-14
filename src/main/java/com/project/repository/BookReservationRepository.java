@@ -1,7 +1,9 @@
 package com.project.repository;
 
 import com.project.domain.entity.BookReservationEntity;
+import com.project.filter.Filter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface BookReservationRepository extends BaseRepository<BookReservationEntity,Integer> {
@@ -16,5 +18,13 @@ public interface BookReservationRepository extends BaseRepository<BookReservatio
     List<BookReservationEntity> findBookReservationsByReservationId(Integer id);
 
     List<BookReservationEntity> findBookReservationsByReservationIdAndStatusNotReturned(Integer id);
+
+    List<BookReservationEntity> findBookReservationsByBookId(Integer id);
+
+    List<BookReservationEntity> findReservationsByIdAndLocalDate(Integer id, LocalDate createdDate);
+
+    List<BookReservationEntity> findReservationsByLocalDate(LocalDate createdDate);
+
+    List<BookReservationEntity> getAll(Filter... filters);
 
 }

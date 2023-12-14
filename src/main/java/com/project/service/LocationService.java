@@ -1,7 +1,6 @@
 package com.project.service;
 
 import com.project.domain.dto.LocationDTO;
-import com.project.filter.Filter;
 
 import java.util.List;
 
@@ -18,6 +17,6 @@ public interface LocationService {
 
     LocationDTO delete(Integer id);
 
-    List<LocationDTO> getAllLocations(Filter... filters);
+    List<LocationDTO> getAllLocations(int pageNumber, int pageSize);
 
 }

@@ -14,6 +14,8 @@ public interface PhysicalCopyService{
 
     PhysicalCopyDTO update(Integer id, PhysicalCopyRequest request);
 
+    PhysicalCopyDTO update(PhysicalCopyDTO book);
+
     PhysicalCopyDTO delete(Integer id);
 
     List<PhysicalCopyDTO> findByTitle(String title);
